@@ -1,119 +1,60 @@
 ﻿/*
-Решить задачу с логинами из урока 2, только логины и пароли считать из файла в массив. 
-Создайте структуру Account, содержащую Login и Password.
-Реализовать метод проверки логина и пароля. На вход подается логин и пароль. 
-На выходе истина, если прошел авторизацию, и ложь, если не прошел (Логин: root, Password: GeekBrains). 
-Используя метод проверки логина и пароля, написать программу: пользователь вводит логин и пароль, 
-программа пропускает его дальше или не пропускает. С помощью цикла do while ограничить ввод пароля тремя попытками.
- */
+1. Создать программу, которая будет проверять корректность ввода логина. Корректным логином будет строка от 2 до 10 символов, содержащая только буквы латинского алфавита или цифры, при этом цифра не может быть первой:
+а) без использования регулярных выражений;
+б) с использованием регулярных выражений.
+*/
 using System;
-using System.IO;
-
-namespace Homework4
+using System.Text.RegularExpressions;
+namespace Task1
 {
-    class Login
-    {
-        public string [] login;
-        public string [] password;
-        public int num;
-        
-        public Login(string filename)
-        {
-            try
-            {
-                string[] array;
-                StreamReader sr = new StreamReader(filename);
-                num = int.Parse(sr.ReadLine());
-                array = new string[num * 2];//the number of logins
-                for (int i = 0; i < num * 2; i++)
-
-                {
-                    array[i] = sr.ReadLine();
-                }
-                sr.Close();
-                login = new string[num];
-                password = new string[num];
-                for (int i = 0, j = 0; i < num * 2; i++, j++)
-
-                {
-                    login[j] = array[i];
-                    i++;
-                    password[j] = array[i];
-
-                }
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine(exc.Message);
-            }
-        }
-        public void LoginOutput()
-        {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{login[i]} {i}");
-            }
-
-            }
-        public void PasswordOutput()
-        {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{password[i]} {i}");
-            }
-
-        }
-        public int Check(string _login, string _password)
-        {
-
-            for (int i = 0; i < num; i++)
-            {
-                if (_login == login[i] && _password == password[i])
-                    return 1;
-            }
-            return 0;
-
-        }
-    }
     class Program
     {
-        static int Authorisation(Login array)
+        static bool RegularCheckingLogin(string txt)/// using regular functions
         {
-            int key = 0, i=0;
-            do
-            {
-                Console.WriteLine("Try to input the login and password.");
-                string login;
-                string password;
-                login = Console.ReadLine();
-                password = Console.ReadLine();
-                if (array.Check(login, password)==1)
+            Regex myReg = new Regex("[^A-Za-z0-9]");
+            char first = txt.ToCharArray()[0];
+            if (myReg.IsMatch(txt) == false && txt.Length > 2 && txt.Length < 10 && char.IsNumber(first) == false)
+                return true;
+            return false;
+        }
+        static bool ANRegularCheckingLogin(string txt)/// using regular functions
+        {
+            char[] first = txt.ToCharArray();
+            if (char.IsNumber(first[0]) == false && first.Length > 2 && first.Length < 10)
+                foreach (char a in first)
                 {
-                    key = 1;
-                    Console.WriteLine("okey, come in");
-                    return 1;
+                    if (char.IsNumber(a) == false && char.IsLetter(a) == false)
+                        return false;
+                }
+            else
+                return false;
+            return true;
+            
+        }
+
+        static void WriteBeautiful(string txt, ConsoleColor txtcolor)
+        {
+            Console.ForegroundColor = txtcolor;
+            Console.WriteLine(txt);
+            Console.ForegroundColor = ConsoleColor.White;
+
+        }
+
+        static void Main(string[] args)
+        {
+            WriteBeautiful("The 5th homework in geekbrains. Task 1", ConsoleColor.Red);
+            WriteBeautiful("Input the login: ", ConsoleColor.Blue);
+            string login;
+            while ((login = Console.ReadLine()) != "stop")
+            {
+                if (ANRegularCheckingLogin(login) == true)
+                {
+                    WriteBeautiful("Ok", ConsoleColor.Blue);
+                    WriteBeautiful("Input the login: ", ConsoleColor.Blue);
                 }
                 else
-                {
-                    i++;
-                    Console.WriteLine($"no, its wrong, you can try {3 - i} more times");
-                }
-
-            } while (key == 0 && i < 3);
-            return 0;
-        }
-        static void Main()
-        {
-            Console.WriteLine("The fourth homework in geekbrains. Task 4");
-            string filename = @"C:\Users\Dasha\Desktop\GEEKBRAINS\GBrainCsharp\Homework4\Task4\Homework4\data.txt";
-            Login array = new Login(filename);
-            for (int i = 0; i < array.num; i++)
-            {
-                Console.WriteLine($"user number {i+1}");
-                Console.WriteLine(array.login[i]);
-                Console.WriteLine(array.password[i]);
+                    WriteBeautiful("try again", ConsoleColor.Blue);
             }
-            Authorisation(array);
         }
     }
 }
