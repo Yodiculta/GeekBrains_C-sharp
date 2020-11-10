@@ -1,119 +1,217 @@
 ﻿/*
-Решить задачу с логинами из урока 2, только логины и пароли считать из файла в массив. 
-Создайте структуру Account, содержащую Login и Password.
-Реализовать метод проверки логина и пароля. На вход подается логин и пароль. 
-На выходе истина, если прошел авторизацию, и ложь, если не прошел (Логин: root, Password: GeekBrains). 
-Используя метод проверки логина и пароля, написать программу: пользователь вводит логин и пароль, 
-программа пропускает его дальше или не пропускает. С помощью цикла do while ограничить ввод пароля тремя попытками.
- */
+ * 2. Разработать класс Message, содержащий следующие статические методы для обработки
+текста:
+а) Вывести только те слова сообщения, которые содержат не более n букв.
+б) Удалить из сообщения все слова, которые заканчиваются на заданный символ.
+в) Найти самое длинное слово сообщения.
+г) Сформировать строку с помощью StringBuilder из самых длинных слов сообщения.
+Продемонстрируйте работу программы на текстовом файле с вашей программой.
+д) ***Создать метод, который производит частотный анализ текста. 
+В качестве параметра в него передается массив слов и текст, в качестве результата метод возвращает сколько раз каждое из слов массива входит в этот текст. 
+Здесь требуется использовать класс Dictionary.
+*/
 using System;
 using System.IO;
+using System.Threading;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Collections.Generic;
 
-namespace Homework4
+namespace Task2
 {
-    class Login
+    
+    class Message
     {
-        public string [] login;
-        public string [] password;
-        public int num;
-        
-        public Login(string filename)
+       
+        string[] file;
+        public int count;
+        private Regex myReg = new Regex("[^A-Za-zА-Яа-я]");
+        public Message(string filename)
         {
-            try
+            file = File.ReadAllLines(filename);
+            Count = count;
+        }
+        private int Count
+        {
+            set
             {
-                string[] array;
-                StreamReader sr = new StreamReader(filename);
-                num = int.Parse(sr.ReadLine());
-                array = new string[num * 2];//the number of logins
-                for (int i = 0; i < num * 2; i++)
-
-                {
-                    array[i] = sr.ReadLine();
-                }
-                sr.Close();
-                login = new string[num];
-                password = new string[num];
-                for (int i = 0, j = 0; i < num * 2; i++, j++)
-
-                {
-                    login[j] = array[i];
-                    i++;
-                    password[j] = array[i];
-
-                }
+                count = file.Length;
             }
-            catch (Exception exc)
+            get
             {
-                Console.WriteLine(exc.Message);
+                return count;
             }
         }
-        public void LoginOutput()
-        {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{login[i]} {i}");
-            }
 
-            }
-        public void PasswordOutput()
+        public void outPutWordlWithN(int n)
         {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{password[i]} {i}");
-            }
 
+            for (int i = 0; i < count; i++)
+            {
+                foreach (string word in file[i].Split())
+                {
+                    if (word.Length < n && myReg.IsMatch(word) == false)
+                        Console.WriteLine(word);
+                }
+            }
         }
-        public int Check(string _login, string _password)
+        public void DelWithSymbol(char symbol)
         {
-
-            for (int i = 0; i < num; i++)
+            for (int i = 0; i < count; i++)
             {
-                if (_login == login[i] && _password == password[i])
-                    return 1;
+                foreach (string word in file[i].Split())
+                {
+                    if (word != "")
+                        if (word.ToCharArray()[word.Length - 1] == symbol)
+                            file[i] = file[i].Remove(file[i].IndexOf(symbol) - word.Length + 1, word.Length);
+                }
             }
-            return 0;
+        }
+        public void PrintFile()
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Console.WriteLine(file[i]);
+            }
+        }
+        public string FindMaxWord()
+        {
+            string Max = "";
+            for (int i = 0; i < count; i++)
+            {
+                foreach (string word in file[i].Split())
+                {
+                    if (word.Length > Max.Length)
+                        Max = word;
+                }
+            }
+            return Max;
+        }
+        public string FindMaxWord(string answer)
+        {
+            string Max = "";
+            for (int i = 0; i < count; i++)
+            {
+                foreach (string word in file[i].Split())
+                {
+                    if (word.Length > Max.Length && answer.IndexOf(word)==-1)
+                        Max = word;
+                }
+            }
+            return Max;
+        }
+        private int CountOfOneLengthWords(StringBuilder _bigWord)
+        {
+            int num = 0;
+            for (int i = 0; i < count; i++)
+            {
+                foreach (string word in file[i].Split())
+                {
+                    if (_bigWord.Equals(word))
+                        num += 1;
+                }
+            }
+            return num;
+        }
+        public string StringOfMaxWords(int count)
+        {
+            StringBuilder answer = new StringBuilder(FindMaxWord());
+            string one = answer.ToString();
+            answer.Append(" ");
 
+            for (int i = 0; i < count - 1; i++)
+            {
+                one = FindMaxWord(answer.ToString());
+                answer.Append(one);
+                answer.Append(" ");
+            }
+            return answer.ToString();
+        }
+         public Dictionary<int, string> MyDic(int i)
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            for (int i = 0; i < count; i++)
+            {
+                foreach (string word in file[i].Split())
+                {
+                    if (_bigWord.Equals(word))
+                        num += 1;
+                }
+            }
+            Console.WriteLine("Введите имя сотрудника: \n");
+            string s;
+            for (int j = 0; j < i; j++)
+            {
+                Console.Write("Name{0} --> ", j);
+                s = Console.ReadLine();
+                dic.Add(j, s);
+                Console.Clear();
+            }
+            return dic;
         }
     }
+
     class Program
     {
-        static int Authorisation(Login array)
+        static void WriteBeautiful(string txt, ConsoleColor txtcolor)
         {
-            int key = 0, i=0;
-            do
-            {
-                Console.WriteLine("Try to input the login and password.");
-                string login;
-                string password;
-                login = Console.ReadLine();
-                password = Console.ReadLine();
-                if (array.Check(login, password)==1)
-                {
-                    key = 1;
-                    Console.WriteLine("okey, come in");
-                    return 1;
-                }
-                else
-                {
-                    i++;
-                    Console.WriteLine($"no, its wrong, you can try {3 - i} more times");
-                }
+            Console.ForegroundColor = txtcolor;
+            Console.WriteLine(txt);
+            Console.ForegroundColor = ConsoleColor.White;
 
-            } while (key == 0 && i < 3);
-            return 0;
         }
+
         static void Main()
         {
-            Console.WriteLine("The fourth homework in geekbrains. Task 4");
-            string filename = @"C:\Users\Dasha\Desktop\GEEKBRAINS\GBrainCsharp\Homework4\Task4\Homework4\data.txt";
-            Login array = new Login(filename);
-            for (int i = 0; i < array.num; i++)
+            WriteBeautiful("The 5th homework in geekbrains. Task 2", ConsoleColor.Red);
+            string filename = @"C:\Users\Dasha\Desktop\GEEKBRAINS\GBrainCsharp\Homework5\Homework5_2\Task2\Message.txt";
+            if (File.Exists(filename))
             {
-                Console.WriteLine($"user number {i+1}");
-                Console.WriteLine(array.login[i]);
-                Console.WriteLine(array.password[i]);
+                Message Msg = new Message(filename);
+
+                int number = 1, key = 1;
+                while ((number > 0 || number < 4) && key == 1)
+                {
+                    key = 0;
+                    WriteBeautiful("1 Вывести только те слова сообщения, которые содержат не более n букв.", ConsoleColor.Red);
+                    WriteBeautiful("2 Удалить из сообщения все слова, которые заканчиваются на заданный символ.", ConsoleColor.Red);
+                    WriteBeautiful("3 Найти самое длинное слово сообщения.", ConsoleColor.Red);
+                    WriteBeautiful("4 Сформировать строку с помощью StringBuilder из самых длинных слов сообщения.", ConsoleColor.Red);
+                    number = Convert.ToInt32(Console.ReadLine());
+                    switch (number)
+                    {
+                        case 1:
+                            WriteBeautiful("Input the number of literals", ConsoleColor.Blue);
+                            Msg.outPutWordlWithN(Convert.ToInt32(Console.ReadLine()));
+                            break;
+                        case 2:
+                            WriteBeautiful("Input the symbol", ConsoleColor.Blue);
+                            Msg.DelWithSymbol(Convert.ToChar(Console.ReadLine()));
+                            Msg.PrintFile();
+                            break;
+                        case 3:
+                            WriteBeautiful("The longest word is: "+Msg.FindMaxWord()+"", ConsoleColor.DarkGreen);
+                            break;
+                        case 4:
+                            WriteBeautiful("The number of words: ", ConsoleColor.Blue);
+                            WriteBeautiful("Строка из самых длинных слов:"+ Msg.StringOfMaxWords(Convert.ToInt32(Console.ReadLine())) +"", ConsoleColor.Red);
+                            
+                            break;
+                        default:
+
+                            Console.WriteLine("Have a nice day!");//TASK_6
+                            Environment.Exit(0);
+                            break;
+                    }
+                    WriteBeautiful("To continue?(yes/no)", ConsoleColor.Blue);
+
+                    if (Console.ReadLine() == "yes")
+                    {
+                        key = 1;
+                    }
+                }
             }
-            Authorisation(array);
+
         }
     }
 }
