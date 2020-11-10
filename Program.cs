@@ -1,119 +1,99 @@
 ﻿/*
-Решить задачу с логинами из урока 2, только логины и пароли считать из файла в массив. 
-Создайте структуру Account, содержащую Login и Password.
-Реализовать метод проверки логина и пароля. На вход подается логин и пароль. 
-На выходе истина, если прошел авторизацию, и ложь, если не прошел (Логин: root, Password: GeekBrains). 
-Используя метод проверки логина и пароля, написать программу: пользователь вводит логин и пароль, 
-программа пропускает его дальше или не пропускает. С помощью цикла do while ограничить ввод пароля тремя попытками.
- */
+Модифицировать программу нахождения минимума функции так, чтобы можно было передавать функцию в виде делегата. 
+а) Сделать меню с различными функциями и представить пользователю выбор, для какой функции и на каком отрезке находить минимум. Использовать массив (или список) делегатов, в котором хранятся различные функции.
+б) *Переделать функцию Load, чтобы она возвращала массив считанных значений. Пусть она возвращает минимум через параметр (с использованием модификатора out). 
+*/
 using System;
+using System.Collections.Generic;
 using System.IO;
-
-namespace Homework4
+namespace Task2
 {
-    class Login
-    {
-        public string [] login;
-        public string [] password;
-        public int num;
-        
-        public Login(string filename)
-        {
-            try
-            {
-                string[] array;
-                StreamReader sr = new StreamReader(filename);
-                num = int.Parse(sr.ReadLine());
-                array = new string[num * 2];//the number of logins
-                for (int i = 0; i < num * 2; i++)
-
-                {
-                    array[i] = sr.ReadLine();
-                }
-                sr.Close();
-                login = new string[num];
-                password = new string[num];
-                for (int i = 0, j = 0; i < num * 2; i++, j++)
-
-                {
-                    login[j] = array[i];
-                    i++;
-                    password[j] = array[i];
-
-                }
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine(exc.Message);
-            }
-        }
-        public void LoginOutput()
-        {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{login[i]} {i}");
-            }
-
-            }
-        public void PasswordOutput()
-        {
-            for (int i = 0; i < num; i++)
-            {
-                Console.WriteLine($"{password[i]} {i}");
-            }
-
-        }
-        public int Check(string _login, string _password)
-        {
-
-            for (int i = 0; i < num; i++)
-            {
-                if (_login == login[i] && _password == password[i])
-                    return 1;
-            }
-            return 0;
-
-        }
-    }
+    public delegate double Fun(double x);
     class Program
     {
-        static int Authorisation(Login array)
+        public static double F(double x)
         {
-            int key = 0, i=0;
-            do
+            return x * x - 50 * x + 10;
+        }
+        public static double SinCos(double x)
+        {
+            return Math.Sin(x)-Math.Cos(x);
+        }
+        public static void SaveFunc(string fileName, double a, double b, double h, Fun Fun)
+        {
+            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+            BinaryWriter bw = new BinaryWriter(fs);
+            double x = a;
+            while (x <= b)
             {
-                Console.WriteLine("Try to input the login and password.");
-                string login;
-                string password;
-                login = Console.ReadLine();
-                password = Console.ReadLine();
-                if (array.Check(login, password)==1)
+                bw.Write(Fun(x));
+                x += h;
+            }
+            bw.Close();
+            fs.Close();
+        }
+        public static double[] Load(string fileName, out double min)
+        {
+            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            BinaryReader bw = new BinaryReader(fs);
+            min = double.MaxValue;
+            double []d=new double [fs.Length];
+            for (int i = 0; i < fs.Length / sizeof(double); i++)
+            {
+                // Считываем значение и переходим к следующему
+                d[i] = bw.ReadDouble();
+                if (d[i] < min) min = d[i];
+            }
+            bw.Close();
+            fs.Close();
+            return d;
+        }
+        static void WriteBeautiful(string txt, ConsoleColor txtcolor)
+        {
+            Console.ForegroundColor = txtcolor;
+            Console.WriteLine(txt);
+            Console.ForegroundColor = ConsoleColor.White;
+
+        }
+        static void Main(string[] args)
+        {
+            Console.WriteLine("The 6th homework in geekbrains. Task 2");
+            
+            int number = 1;
+            int key = 1;
+            int left=0, right=0;
+            List<Fun> list = new List<Fun>();
+            list.Add(F);
+            list.Add(SinCos);
+            double min;
+            while (number > 0 || number < 4)
+            {
+                Console.WriteLine(Load("data.bin", out min).Length);
+                Console.WriteLine(min);
+                WriteBeautiful("Choose the one:\n1)x^2-50x+10;\n2) sin(x)-cos(x)\n3)exit", ConsoleColor.Red);
+                number = Convert.ToInt32(Console.ReadLine());
+                if (number < 3 && number > 0)
                 {
-                    key = 1;
-                    Console.WriteLine("okey, come in");
-                    return 1;
-                }
-                else
-                {
-                    i++;
-                    Console.WriteLine($"no, its wrong, you can try {3 - i} more times");
+                    WriteBeautiful("input the left border", ConsoleColor.Blue);
+                    left = Convert.ToInt32(Console.ReadLine());
+                    WriteBeautiful("input the left border", ConsoleColor.Blue);
+                    right = Convert.ToInt32(Console.ReadLine());
                 }
 
-            } while (key == 0 && i < 3);
-            return 0;
-        }
-        static void Main()
-        {
-            Console.WriteLine("The fourth homework in geekbrains. Task 4");
-            string filename = @"C:\Users\Dasha\Desktop\GEEKBRAINS\GBrainCsharp\Homework4\Task4\Homework4\data.txt";
-            Login array = new Login(filename);
-            for (int i = 0; i < array.num; i++)
-            {
-                Console.WriteLine($"user number {i+1}");
-                Console.WriteLine(array.login[i]);
-                Console.WriteLine(array.password[i]);
+                switch (number)
+                {
+                    case 1:
+                        SaveFunc("data.bin", left, right, 0.5, list[0]);
+                        break;
+                    case 2:
+                        SaveFunc("data.bin", left, right, 0.5, list[1]);
+                        break;
+                    default:
+                        Console.WriteLine("Have a nice day!");
+                        Environment.Exit(0);
+                        break;
+                }
             }
-            Authorisation(array);
         }
     }
 }
