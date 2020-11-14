@@ -1,166 +1,63 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Collections.Generic;
-using Microsoft.VisualBasic;
-using System.IO;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
-
-
-namespace calculator
+namespace Guess_The_Number
 {
     public partial class Form1 : Form
     {
-        private DialogResult internalDialogResult = DialogResult.None;
-        private Stack<int> numbers = new Stack<int>();//0-plus, 1-mult
-
-        Random rand = new Random();
-        public DialogResult InternalDialogResult
-        {
-            get { return internalDialogResult; }
-        }
-
+        
         public Form1()
         {
-
-            int num = rand.Next(1, 40);
             InitializeComponent();
-            MessageBox.Show($"Try to reach {num} int minimal count of operations!", "Conditions", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-            num_lab.Text = num.ToString();
-            numbers.Push(-1);
-            plus_lab.Text = "0";
-            mult_lab.Text = "0";
-        }
-        private int minimal_count_of_steps(int number)
-        {
-            int steps = 0;
+            var rand = new Random();
+            int number = rand.Next(10, 200);
+            number_l.Visible = false;
+            number_l.Text = number.ToString();
+            //MessageBox.Show(int.Parse(count_lab.Text).ToString());
 
-            while (number > 1)
+        }
+        private int Checking(int num)
+        {
+            int num_real = int.Parse(number_l.Text);
+            if (num_real > num)
             {
-                steps += minimal_count_of_mult(ref number);
-                if (number != 1)
-                {
-                    number -= 1;
-                    steps++;
-                }
+                inf_lab.Text = "It's more";
+                return 0;
             }
-           
-            return steps;
-
-        }
-        private int minimal_count_of_mult(ref int number)
-        {
-            int i = 0;
-            while(number%2==0)
+            if (num_real < num)
             {
-                number /= 2;
-                i++;
+                inf_lab.Text = "It's less";
+                return 0;
             }
-            return i;
-        }
-        private void button3_Click_1(object sender, EventArgs e)
-        {
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-                answer_lab.Text = (int.Parse(answer_lab.Text) * 2).ToString();
-                mult_lab.Text = (int.Parse(mult_lab.Text) + 1).ToString();
-            Check(int.Parse(answer_lab.Text));
-            numbers.Push(1);
-
-        }
-
-        private void num_pluses_click(object sender, EventArgs e)
-        {
-            plus_lab.Text = "0";
-
-        }
-
-        private void num_mult_click(object sender, EventArgs e)
-        {
-            mult_lab.Text = "0";
-        }
-
-        private void play_but_Click(object sender, EventArgs e)
-        {
-            internalDialogResult = DialogResult.Abort;
-            Close();
-        }
-        private void reset()
-        {
-            plus_lab.Text = "0";
-            mult_lab.Text = "0";
-            answer_lab.Text = "1";
-            numbers.Clear();
-            numbers.Push(-1);
-        }
-        private void reset_but_Click(object sender, EventArgs e)
-        {
-            reset();
-
-
-        }
-        private void Check(int num1)
-        {
-            if (num1 > int.Parse(num_lab.Text))
+            if (num_real == num)
             {
-                MessageBox.Show("Failure!");
-                internalDialogResult = DialogResult.No;
-                Close();
+                inf_lab.Text = "Yes! It is";
+                return 1;
             }
-            if (num1 == int.Parse(num_lab.Text))
-            {
-                MessageBox.Show("Victory!");
-                internalDialogResult = DialogResult.Yes;
-                int min_mult = minimal_count_of_steps(int.Parse(num_lab.Text));
-                MessageBox.Show($"That is perfect result: {min_mult}\nThat is your result: {int.Parse(mult_lab.Text)+ int.Parse(plus_lab.Text)}");
+            return -1;
 
-                if ((MessageBox.Show("To save resutl?", "Victory!", MessageBoxButtons.YesNo))==DialogResult.Yes)
-                    {
-                    string name = Interaction.InputBox("Your name");
-                    FileStream fs = new FileStream(@"C:\Users\Dasha\source\repos\calculator\Properties\The_table_of_winners.txt", FileMode.OpenOrCreate, FileAccess.Write);
-                    StreamWriter writer = new StreamWriter(fs);
-                    writer.WriteLine($"{name} won in the fight with {int.Parse(mult_lab.Text) + int.Parse(plus_lab.Text)} in {min_mult}");
-                    writer.Close();
-                    fs.Close();
-                    reset();
-                }
-                
-                Close();
+        }
+
+        private void check_but_Click(object sender, EventArgs e)
+        {
+            int num = int.Parse(tb.Text);
+            count_lab.Text = (int.Parse(count_lab.Text) + 1).ToString();
+            if (Checking(num)==1)
+            {
+                MessageBox.Show($"you made {int.Parse(count_lab.Text)} steps to find number", "Yees!");
             }
 
         }
 
-        private void _plusOne_Click(object sender, EventArgs e)
+        private void number_l_Click(object sender, EventArgs e)
         {
-            answer_lab.Text = (int.Parse(answer_lab.Text) +1).ToString();
-            plus_lab.Text = (int.Parse(plus_lab.Text) + 1).ToString();
-            Check(int.Parse(answer_lab.Text));
-            numbers.Push(0);
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void back_but_Click(object sender, EventArgs e)
-        {
-            int number = numbers.Pop();
-            if (number==-1)
-                MessageBox.Show("error");
-            if(number==0)
-            {
-                answer_lab.Text = (int.Parse(answer_lab.Text) - 1).ToString();
-                plus_lab.Text = (int.Parse(plus_lab.Text) - 1).ToString();
-            }
-            if (number == 1)
-            {
-                answer_lab.Text = (int.Parse(answer_lab.Text) / 2).ToString();
-                mult_lab.Text = (int.Parse(mult_lab.Text) - 1).ToString();
-            }
-        
 
         }
     }
