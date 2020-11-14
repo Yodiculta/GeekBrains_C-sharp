@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
-namespace calculator
+namespace Guess_The_Number
 {
-    
-    class Program
+    static class Program
     {
-        
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
@@ -19,22 +16,7 @@ namespace calculator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var mainForm = new Form2(); 
-            Application.Run(mainForm);
-
-            switch (mainForm.InternalDialogResult)
-            {
-                case DialogResult.Cancel:
-                    MessageBox.Show("Bye!");
-                    break;
-                case DialogResult.OK:
-
-                    var mainForm2 = new Form1();
-                    DialogResult secondresult = mainForm2.ShowDialog();
-                    break;
-            }
-
-
+            Application.Run(new Form1());
         }
     }
 }
