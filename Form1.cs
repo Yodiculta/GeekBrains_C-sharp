@@ -55,10 +55,5 @@ namespace Guess_The_Number
             }
 
         }
-
-        private void number_l_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
